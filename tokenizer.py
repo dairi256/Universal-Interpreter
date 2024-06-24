@@ -1,40 +1,37 @@
-import re 
+import re
 
 LANGUAGE_MAP = {
-
-    'python' : {
-        'keywords' : r'\b(if|else|while|for|do\def|class|try|except|finally)\b',
-        'identifiers' : r'\b[a-zA-Z_][a-zA-Z_0-9]*\b',
-        'literals' : r'(\d+|[+-]?\d*\.\d+(?:[eE][+-]?\d+)?|[+-]?\d+[Ll])',
-        'symbols' : r'[<>]=|[<>]?=?|[+\-*/%&|^(){}[]:;.,]'
+    'python': {
+        'keywords': r'\b(if|else|while|for|do\def|class|try|except|finally)\b',
+        'identifiers': r'\b[a-zA-Z_][a-zA-Z_0-9]*\b',
+        'literals': r'(\d+|[+-]?\d*\.\\d+(?:[eE][+-]?\d+)?|[+-]?\d+[Ll])',
+        'symbols': r'[<>]=|[<>]?=?|[+\-*/%&|^(){}[]:;.,]',
+        'multi_line_comment': r'(?s)(?L#.*?)(?:\n|$)'
     },
     'java': {
-        'keywords' : r'\b(public|private|protected|static|abstract|final|synchronized|volatile)\b',
-        'identifiers' : r'\b[A-Za-z_][A-Za-z_0-9]*\b',
-        'literals' : r'(\d+|[+-]?\d*\.\\d+(?:[eE][+-]?\d+)?|[+-]?\d+[Ll])',
-        'symbols' : r'[<>]=|[<>]?=?|[+\-*/%&|^(){}[]:;.,]'
-
+        'keywords': r'\b(public|private|protected|static|abstract|final|synchronized|volatile)\b',
+        'identifiers': r'\b[A-Za-z_][A-Za-z_0-9]*\b',
+        'literals': r'(\d+|[+-]?\d*\.\\d+(?:[eE][+-]?\d+)?|[+-]?\d+[Ll])',
+        'symbols': r'[<>]=|[<>]?=?|[+\-*/%&|^(){}[]:;.,]'
     }
 }
 
-def tokenize(code, langage='python'):
-    tokens = []
-    language_info = LANGUAGE_MAP[language]
+def tokenize(code, language='python'):
+    language_info = LANGUAGE_MAP.get(language)
     keywords = re.compile(language_info['keywords'])
     identifiers = re.compile(language_info['identifiers'])
     literals = re.compile(language_info['literals'])
     symbols = re.compile(language_info['symbols'])
 
-    for match in re.finditer(keywords, code):
+    tokens = []
+    for match in keywords.finditer(code):
         tokens.append(('KEYWORD', match.group()))
-
-    for match in re.finditer(identifiers, code):
+    for match in identifiers.finditer(code):
         tokens.append(('IDENTIFIER', match.group()))
-    else:
-        tokens.appned(('LITERAL', match.group()))
-
-    for match in re.finditer(symbols, code):
+    for match in literals.finditer(code):
+        tokens.append(('LITERAL', match.group()))
+    for match in symbols.finditer(code):
         tokens.append(('SYMBOL', match.group()))
 
-        return tokens
+    return tokens
 
