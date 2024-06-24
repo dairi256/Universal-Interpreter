@@ -22,16 +22,34 @@ def tokenize(code, language='python'):
     identifiers = re.compile(language_info['identifiers'])
     literals = re.compile(language_info['literals'])
     symbols = re.compile(language_info['symbols'])
+    multi_line_comment = re.compile(language_info['multi_line_comment'])
 
     tokens = []
-    for match in keywords.finditer(code):
-        tokens.append(('KEYWORD', match.group()))
-    for match in identifiers.finditer(code):
-        tokens.append(('IDENTIFIER', match.group()))
-    for match in literals.finditer(code):
-        tokens.append(('LITERAL', match.group()))
-    for match in symbols.finditer(code):
-        tokens.append(('SYMBOL', match.group()))
+    in_comment = False
+    for char in code:
+        if char == '/':
+            if in_comment:
+                if code[code.index(char) + 1] == '*':
+                    in_comment = False
+                continue
+            else:
+                if code[code.index(char) + 1] == '/':
+                    in_comment = True
+                continue
+        elif in_comment:
+            continue
+        elif match := keywords.match(code, pos=code.index(char)):
+            tokens.append(('KEYWORD', match.group()))
+            continue
+        elif match := identifiers.match(code, pos=code.index(char)):
+            tokens.append(('IDENTIFIER', match.group()))
+            continue
+        elif match := literals.match(code, pos=code.index(char)):
+            tokens.append(('LITERAL', match.group()))
+            continue
+        elif match := symbols.match(code, pos=code.index(char)):
+            tokens.append(('SYMBOL', match.group()))
+            continue
 
     return tokens
 
