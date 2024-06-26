@@ -27,13 +27,50 @@ class Parser:
             raise SyntaxError("Expected keyword")
 
     def parse_if_statement(self):
-        # code for parse if statement
-        pass
-    
+        if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'if':
+            raise SyntaxError("expected 'if' keyword" )
+
+        self.current_token += 1
+        condition = self.parse_expresssion()
+        if self.current_token != 'THEN':
+            raise SyntaxError("Expected 'then'")
+        self.current_token += 1
+        body = self.parse_statement()
+
+        return ASTNode("IF", condition, body)
+            
     def parse_for_loop(self):
-        # code for parse for loop
-        pass
-    
+        if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'for':
+            raise SyntaxError("Expected 'for' keyword")
+
+        self.current_token += 1
+        variable = self.parse_variable()
+        if self.current_token != 'LOOP':
+            raise SyntaxError("Expected 'loop'")
+        
+        self.current_token += 1
+        body = self.parse_statement()
+
+        return ASTNode("FOR_LOOP", variable, iterable, body)
+
+    def parse_expression(self):
+        token = self.tokens[self.current_token]
+        if token in ['NUMBER', 'STRING', 'IDENTIFIER']:
+            self.current_token += 1
+            return token
+        elif token == '(':
+            self.current_token += 1
+            expression = self.parse_expression()
+            if self.current_token != ')':
+                raise SyntaxError("Expected ')'")
+
+    def parse_variable(self):
+        token = self.tokens[self.current_token]
+        if token.isalpha():
+            self.current_token += 1
+            return token
+        else:
+            raise SyntaxError("Expected variable")
     # use this line or more lines to implement other parsing functions.
 
 class ASTNode:
