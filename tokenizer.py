@@ -1,18 +1,12 @@
 import re
+import string
 
 LANGUAGE_MAP = {
     'python': {
-        'keywords': r'\b(if|else|while|for|do\def|class|try|except|finally)\b',
-        'identifiers': r'\b[a-zA-Z_][a-zA-Z_0-9]*\b',
-        'literals': r'(\d+|[+-]?\d*\.\\d+(?:[eE][+-]?\d+)?|[+-]?\d+[Ll])',
-        'symbols': r'[<>]=|[<>]?=?|[+\-*/%&|^(){}[]:;.,]',
-        'multi_line_comment': r'(?s)(?L#.*?)(?:\n|$)'
-    },
-    'java': {
-        'keywords': r'\b(public|private|protected|static|abstract|final|synchronized|volatile)\b',
-        'identifiers': r'\b[A-Za-z_][A-Za-z_0-9]*\b',
-        'literals': r'(\d+|[+-]?\d*\.\\d+(?:[eE][+-]?\d+)?|[+-]?\d+[Ll])',
-        'symbols': r'[<>]=|[<>]?=?|[+\-*/%&|^(){}[]:;.,]'
+        'keywords': r'\b(replace|with|from|import|class|def|if|else|elif|while|for|in|not|and|or|xor|is|isnt|in\W+|\W+in)\b',
+        'identifiers': r'[a-zA-Z_][a-zA-Z0-9_]*',
+        'literals': r"[rR]\"([\\\"]|[^\"])*\"|[rR]'([\\']|[^\'])*'",
+        'symbols': r'[' + re.escape(string.punctuation) + ']'
     }
 }
 
@@ -23,6 +17,7 @@ def tokenize(code, language='python'):
     literals = re.compile(language_info['literals'])
     symbols = re.compile(language_info['symbols'])
     multi_line_comment = re.compile(r'\/\*.*?\*\/', re.DOTALL)
+    escape_sequence = re.compile(r'\\.')
 
     tokens = []
     in_comment = False
@@ -48,11 +43,20 @@ def tokenize(code, language='python'):
             tokens.append(('IDENTIFIER', match.group()))
             continue
         elif match := literals.match(code, pos=code.index(char)):
-            tokens.append(('LITERAL', match.group()))
-            continue
+            if match.group().startswith('r"') or match.group().startswith('r\''):
+                tokens.append(('LITERAL', match.group()))
+                continue
+            else:
+                tokens.append(('STRING_LITERAL', match.group().strip('"\'')))
+                continue
         elif match := symbols.match(code, pos=code.index(char)):
-            tokens.append(('SYMBOL', match.group()))
-            continue
+            if match.group() == '\\':
+                if match := escape_sequence.match(code[code.index(char) + 1]):
+                    tokens.append(('SYMBOL', match.group()))
+                    continue
+            else:
+                tokens.append(('SYMBOL', match.group()))
+                continue
 
     highlighted_code = ''
     for token in tokens:
@@ -60,6 +64,8 @@ def tokenize(code, language='python'):
             highlighted_code += f'**{token[1]}** '
         elif token[0] == 'LITERAL':
             highlighted_code += f'{token[1]} '
+        elif token[0] == 'STRING_LITERAL':
+            highlighted_code += f"'{token[1]}' "
         else:
             highlighted_code += f'{token[1]} '
     return {'tokens': tokens, 'highlighted_code': highlighted_code.strip()}
