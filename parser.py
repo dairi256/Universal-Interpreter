@@ -155,6 +155,19 @@ class Parser:
             elif token == '[':
                 expression = self.parse_array_access()
                 return expression
+
+        def parse_array(self):
+            if self.current_token != '[':
+                raise SyntaxError("Expected '['")
+            self.current_token += 1
+            elements = []
+            while True:
+                element = self.parse_expression()
+                elements.appens(element)
+                if self.current_token == ']':
+                    break
+                elif self.current_token == ',':
+                    self.current_token += 1
     # use this line or more lines to implement other parsing functions.
 
 class ASTNode:
