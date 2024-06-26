@@ -22,23 +22,26 @@ def tokenize(code, language='python'):
     identifiers = re.compile(language_info['identifiers'])
     literals = re.compile(language_info['literals'])
     symbols = re.compile(language_info['symbols'])
-    multi_line_comment = re.compile(language_info['multi_line_comment'])
+    multi_line_comment = re.compile(r'\/\*.*?\*\/', re.DOTALL)
 
     tokens = []
     in_comment = False
+    comment = ''
     for char in code:
         if char == '/':
-            if in_comment:
+            if not in_comment:
                 if code[code.index(char) + 1] == '*':
-                    in_comment = False
-                continue
+                    in_comment = True
+                    continue
             else:
                 if code[code.index(char) + 1] == '/':
-                    in_comment = True
-                continue
+                    in_comment = False
+                    continue
         elif in_comment:
+            comment += char
             continue
-        elif match := keywords.match(code, pos=code.index(char)):
+
+        if match := keywords.match(code, pos=code.index(char)):
             tokens.append(('KEYWORD', match.group()))
             continue
         elif match := identifiers.match(code, pos=code.index(char)):
@@ -51,5 +54,12 @@ def tokenize(code, language='python'):
             tokens.append(('SYMBOL', match.group()))
             continue
 
-    return tokens
-
+    highlighted_code = ''
+    for token in tokens:
+        if token[0] == 'KEYWORD':
+            highlighted_code += f'**{token[1]}** '
+        elif token[0] == 'LITERAL':
+            highlighted_code += f'{token[1]} '
+        else:
+            highlighted_code += f'{token[1]} '
+    return {'tokens': tokens, 'highlighted_code': highlighted_code.strip()}
