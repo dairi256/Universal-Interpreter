@@ -1,3 +1,6 @@
+class SyntaxError(Exception):
+    pass
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -74,8 +77,14 @@ class Parser:
     # use this line or more lines to implement other parsing functions.
 
 class ASTNode:
-    def __init__(self, token):
+    def __init__(self, token, *args):
         self.token = token
+        if len(args) > 0:
+            for arg in args:
+                setattr(self, "value", arg)
 
     def __str__(self):
-        return str(self.token)
+        if hasattr(self, "value"):
+            return f"{self.token}({self.value})"
+        else:
+            return str(self.token)
