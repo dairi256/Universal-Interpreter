@@ -74,6 +74,87 @@ class Parser:
             return token
         else:
             raise SyntaxError("Expected variable")
+
+    def parse_variable_declaration(self):
+        if self.current_token != 'IDENTIFIER':
+            raise SyntaxError("Expected identifier")
+            variable = self.tokens[self.current_token]
+            self.current_token += 1
+            value = self.parse_expression()
+            return f"{variable} = {value}"
+        else:
+            return variable
+
+    def parse_statement(self):
+        if self.current_token >= len(self.tokens):
+            raise SyntaxError("Unexpected end of input")
+
+        token = self.tokens[self.current_token]
+        self.current_token += 1
+
+        if token == 'KEYWORD':
+            keyword = self.tokens[self.current_token - 1]
+            if keyword == 'if':
+                return self.parse_if_statement()
+            elif keyword == 'for':
+                return self.parse_for_loop()
+            elif keyword == 'func':
+                return self.parse_variable_declaration()
+                # handle other keywords..
+        elif token.isalpha():
+            return self.parse_variable_declaration()
+        else:
+            raise SyntaxError("Expected keyword or identifier")
+        
+        def parse_function_declaration(self):
+            if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'func':
+                raise SyntaxError("Expected 'func' keyword")
+            self.current_token += 1
+            function_name = self.parse_identifier()
+            self.current_token += 1
+            body = self.parse_statement()
+            return ASTNode("FUNCTION", function_name, body)
+
+        def parse_identifier(self):
+            token = self.tokens[self.current_token]
+            if token.isalpha():
+                self.current_token += 1
+                return token
+            else:
+                raise SyntaxError("Expected identifier")
+        
+        def parse_function_call(self):
+            if self.current_token != 'IDENTIFIER':
+                raise SyntaxError("Expected identifier")
+            function_name = self.tokens[self.current_token]
+            self.current_token += 1
+            if self.current_token != '(':
+                raise SyntaxError("Expected '(")
+            arguments = []
+            while True:
+                argument = self.parse_expression()
+                arguments.append(argument)
+                if self.current_token == ')':
+                    self.current_token += 1
+                    break
+                elif self.current_token == ',':
+                    self.current_token += 1
+                else:
+                    raise SyntaxError("Expected ')' or ','")
+            return ASTNode("FUNCTION_CALL", function_name, arguments)
+
+        def parse_expression(self):
+            token = self.tokens[self.current_token]
+            if token in ["NUMBER', 'STRING', 'IDENTIFIER'"]:
+                expression = token
+                self.current_token += 1
+                return expression
+            elif token == '(':
+                expression = self.parse_function_call()
+                return expression
+            elif token == '[':
+                expression = self.parse_array_access()
+                return expression
     # use this line or more lines to implement other parsing functions.
 
 class ASTNode:
