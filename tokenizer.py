@@ -5,7 +5,7 @@ LANGUAGE_MAP = {
     'python': {
         'keywords': r'\b(replace|with|from|import|class|def|if|else|elif|while|for|in|not|and|or|xor|is|isnt|in\W+|\W+in)\b',
         'identifiers': r'[a-zA-Z_][a-zA-Z0-9_]*',
-        'literals': r"[rR]\"[^\"]*\"|[rR][^\']*[^\']\'|[rR]\['[^']*'\]\"",
+        'literals': r"[rR]\"([^\"]|[\\\"]|[^\"])*\"|[rR]'([^\']|[\\\']|[^\'])*\'|[rR]\['([^\']|[\\\']|[^\'])*'\]\"",
         'symbols': r'[' + re.escape(string.punctuation) + ']'
     }
 }
@@ -17,7 +17,8 @@ def tokenize(code, language='python'):
     literals = re.compile(language_info['literals'], re.UNICODE)
     symbols = re.compile(language_info['symbols'], re.UNICODE)
     multi_line_comment = re.compile(r'\/\*.*?\*\/', re.DOTALL)
-    escape_sequence = re.compile(r'\\.')
+    single_line_comment = re.compile(r'\/\/.*$')
+    unicode_escape_sequence = re.compile(r'\\u[0-9a-fA-F]{4}')
     whitespace = re.compile(r'\s+')
 
     tokens = []
@@ -37,29 +38,33 @@ def tokenize(code, language='python'):
             comment += char
             continue
 
-        if match := keywords.match(code, pos=code.index(char)):
+        if match := single_line_comment.match(code):
+            tokens.append(('COMMENT', match.group()))
+            continue
+
+        if match := keywords.match(code):
             tokens.append(('KEYWORD', match.group()))
             continue
-        elif match := identifiers.match(code, pos=code.index(char)):
+        elif match := identifiers.match(code):
             tokens.append(('IDENTIFIER', match.group()))
             continue
-        elif match := literals.match(code, pos=code.index(char)):
+        elif match := literals.match(code):
             if match.group().startswith('r"') or match.group().startswith('r\''):
                 tokens.append(('LITERAL', match.group()))
                 continue
             else:
                 tokens.append(('STRING_LITERAL', match.group().strip('"\'')))
                 continue
-        elif match := symbols.match(code, pos=code.index(char)):
+        elif match := symbols.match(code):
             if match.group() == '\\':
-                if match := escape_sequence.match(code[code.index(char) + 1]):
+                if match := unicode_escape_sequence.match(code[code.index(char) + 1]):
                     tokens.append(('SYMBOL', match.group()))
                     continue
             else:
                 tokens.append(('SYMBOL', match.group()))
                 continue
 
-        if match := whitespace.match(code, pos=code.index(char)):
+        if match := whitespace.match(code):
             tokens.append(('WHITESPACE', match.group()))
             continue
 
@@ -73,6 +78,8 @@ def tokenize(code, language='python'):
             highlighted_code += f"'{token[1]}' "
         elif token[0] == 'WHITESPACE':
             highlighted_code += f'{token[1]} '
+        elif token[0] == 'COMMENT':
+            highlighted_code += f'# {token[1]} '
         else:
             highlighted_code += f'{token[1]} '
     return {'tokens': tokens, 'highlighted_code': highlighted_code.strip()}
