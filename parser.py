@@ -16,18 +16,23 @@ class Parser:
         if self.current_token >= len(self.tokens):
             raise SyntaxError("Unexpected end of input")
 
-        token = self.tokens[self.current_token]
-        self.current_token += 1
+    token = self.tokens[self.current_token]
+    self.current_token += 1
 
-        if token == 'KEYWORD':
-            keyword = self.tokens[self.current_token - 1]
-            if keyword == 'if':
-                return self.parse_if_statement()
-            elif keyword == 'for':
-                return self.parse_for_loop()
-                # handle other keywords..
+    if token == 'KEYWORD':
+        keyword = self.tokens[self.current_token - 1]
+        if keyword == 'if':
+            return self.parse_if_statement()
+        elif keyword == 'for':
+            return self.parse_for_loop()
+        elif keyword == 'func':
+            return self.parse_function_declaration()
+        # add more cases for other keywords here...
         else:
-            raise SyntaxError("Expected keyword")
+            raise SyntaxError("Unexpected keyword")
+    else:
+        raise SyntaxError("Expected keyword")
+
 
     def parse_if_statement(self):
         if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'if':
@@ -208,6 +213,20 @@ class Parser:
                 else:
                     raise SyntaxError("Expected '}' or ','")
             return ASTNode("OBJECT_DEFINITION", object_name, properties)
+
+        def parse_class(self):
+            if self.current_token != 'CLASS':
+                raise SyntaxError("Expected 'CLASS' keyword")
+            self.current_token += 1
+            class_name = self.parse_identifier()
+            self.current_token += 1
+            if self.current_token == 'EXTENDS':
+                inheritance = self.parse_inheritance()
+                self.current_token += 1
+            else:
+                inheritance = None
+            body; self.parse_block(self)
+            return ASTNode("CLASS_DEFINITION", class_name, body, inheritance)
     # Put the parsing functions below this line. 
 
 class ASTNode:
