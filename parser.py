@@ -19,8 +19,9 @@ class Parser:
     token = self.tokens[self.current_token]
     self.current_token += 1
 
-    if token == 'KEYWORD':
-        keyword = self.tokens[self.current_token - 1]
+    def parse_keyword(self, token):
+        if token == 'KEYWORD':
+            keyword = self.tokens[self.current_token - 1]
         if keyword == 'if':
             return self.parse_if_statement()
         elif keyword == 'for':
@@ -29,9 +30,7 @@ class Parser:
             return self.parse_function_declaration()
         # add more cases for other keywords here...
         else:
-            raise SyntaxError("Unexpected keyword")
-    else:
-        raise SyntaxError("Expected keyword")
+            raise SyntaxError("Unexpected or expected keyword")
 
 
     def parse_if_statement(self):
