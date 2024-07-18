@@ -12,16 +12,16 @@ class Parser:
             raise SyntaxError("Unexpected token")
         return ast
 
-    def parse_statement(self):
-        if self.current_token >= len(self.tokens):
-            raise SyntaxError("Unexpected end of input")
+def parse_statement(self):
+    if self.current_token >= len(self.tokens):
+        raise SyntaxError("Unexpected end of input")
 
     token = self.tokens[self.current_token]
     self.current_token += 1
 
-    def parse_keyword(self, token):
-        if token == 'KEYWORD':
-            keyword = self.tokens[self.current_token - 1]
+    if token == 'KEYWORD':
+        keyword = self.tokens[self.current_token - 1]
+        self.current_token += 1
         if keyword == 'if':
             return self.parse_if_statement()
         elif keyword == 'for':
@@ -29,8 +29,10 @@ class Parser:
         elif keyword == 'func':
             return self.parse_function_declaration()
         # add more cases for other keywords here...
-        else:
-            raise SyntaxError("Unexpected or expected keyword")
+    elif token.isalpha():
+        return self.parse_variable_declaration()
+    else:
+        raise SyntaxError(f"Expected keyword or identifier (got {token})")
 
 
     def parse_if_statement(self):
