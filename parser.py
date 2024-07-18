@@ -1,6 +1,16 @@
 class SyntaxError(Exception):
     pass
 
+class ASTnode:
+    def __init__(self, value):
+        self.value = value
+
+class IfStatement(ASTNode):
+    def __init__(self, condition, body):
+        super().__init__("IF")
+        self.condition = condition
+        self.body = body
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -40,13 +50,13 @@ def parse_statement(self):
             raise SyntaxError("expected 'if' keyword" )
 
         self.current_token += 1
-        condition = self.parse_expresssion()
+        condition = self.parse_expression()
         if self.current_token != 'THEN':
             raise SyntaxError("Expected 'then'")
         self.current_token += 1
         body = self.parse_statement()
 
-        return ASTNode("IF", condition, body)
+        return IfStatement(condition, body)
             
     def parse_for_loop(self):
         if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'for':
