@@ -5,6 +5,32 @@ class ASTnode:
     def __init__(self, value):
         self.value = value
 
+class BinaryOperation:
+    def __init__(self, left, operator, right):
+        self.left = left
+        self.operator = operator
+        self.right = right
+    
+    def evaluate(self):
+        if self.operator == '+':
+            return self.left + self.right
+        elif self.operator == '-':
+            return self.left - self.right
+        elif self.operator == '*':
+            return self.left * self.right
+        elif self.operator == '/':
+            if self.right == 0:
+                raise ZeroDivisionError("Cannot divide by zero")
+            return self.left / self.right
+        elif self.operator == '**':
+            return pow(self.left, self.right)
+
+    def __str__(self):
+        return f"{self.left} {self.operator} {self.right}"
+
+    def __repr__(self):
+        return f"BinaryOperation({self.left}, '{self.operator}', {self.right})"
+
 class IfStatement(ASTNode):
     def __init__(self, condition, body):
         super().__init__("IF")
