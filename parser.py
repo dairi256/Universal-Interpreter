@@ -89,28 +89,32 @@ class Parser:
         else:
             return variable
 
-    def parse_statement(self):
-        if self.current_token >= len(self.tokens):
-            raise SyntaxError("Unexpected end of input")
+def parse_statement(self):
+    if self.current_token >= len(self.tokens):
+        raise SyntaxError("Unexpected end of input")
 
-        token = self.tokens[self.current_token]
-        self.current_token += 1
+    token = self.tokens[self.current_token]
+    self.current_token += 1
 
-        if token == 'KEYWORD':
-            keyword = self.tokens[self.current_token - 1]
-            if keyword == 'if':
-                return self.parse_if_statement()
-            elif keyword == 'for':
-                return self.parse_for_loop()
-            elif keyword == 'func':
-                return self.parse_variable_declaration()
-                # handle other keywords..
-        elif token.isalpha():
-            return self.parse_variable_declaration()
-        else:
-            raise SyntaxError("Expected keyword or identifier")
+    if token == 'KEYWORD':
+        keyword = self.tokens[self.current_token - 1]
+        if keyword == 'if':
+            return self.parse_if_statement()
+        elif keyword == 'for':
+            return self.parse_for_loop()
+        elif keyword == 'func':
+            return self.parse_function_definition()
+        # handle other keywords...
+    elif token.isalpha():
+        return self.parse_variable_declaration()
+    else:
+        raise SyntaxError(f"Expected keyword or identifier (got {token})")
+
+    # Indentation level increased here
+    # This code will be executed if the if-elif-else conditions are not met
+    print("Default statement")
         
-        def parse_function_declaration(self):
+    def parse_function_declaration(self):
             if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'func':
                 raise SyntaxError("Expected 'func' keyword")
             self.current_token += 1
@@ -119,7 +123,7 @@ class Parser:
             body = self.parse_statement()
             return ASTNode("FUNCTION", function_name, body)
 
-        def parse_identifier(self):
+    def parse_identifier(self):
             token = self.tokens[self.current_token]
             if token.isalpha():
                 self.current_token += 1
@@ -127,7 +131,7 @@ class Parser:
             else:
                 raise SyntaxError("Expected identifier")
         
-        def parse_function_call(self):
+    def parse_function_call(self):
             if self.current_token != 'IDENTIFIER':
                 raise SyntaxError("Expected identifier")
             function_name = self.tokens[self.current_token]
@@ -147,7 +151,7 @@ class Parser:
                     raise SyntaxError("Expected ')' or ','")
             return ASTNode("FUNCTION_CALL", function_name, arguments)
 
-        def parse_expression(self):
+    def parse_expression(self):
             token = self.tokens[self.current_token]
             if token in ["NUMBER', 'STRING', 'IDENTIFIER'"]:
                 expression = token
@@ -160,7 +164,7 @@ class Parser:
                 expression = self.parse_array_access()
                 return expression
 
-        def parse_array(self):
+    def parse_array(self):
             if self.current_token != '[':
                 raise SyntaxError("Expected '['")
             self.current_token += 1
@@ -176,7 +180,7 @@ class Parser:
                     raise SyntaxError("Expected ']' or ','")
                     return ASTNode("ARRAY", elements)
 
-        def parse_array_access(self):
+    def parse_array_access(self):
             if self.current_token != '[':
                 raise SyntaxError("Expected '[]")
             self.current_token += 1
@@ -185,7 +189,7 @@ class Parser:
                 raise SyntaxError("Expected ']'")
             return ASTNode("ARRAY_ACCESS", expression)
 
-        def parse_class(self):
+    def parse_class(self):
             if self.current_token != 'CLASS':
                 raise SyntaxError("Expected 'CLASS' keyword")
             self.current_token += 1
@@ -194,7 +198,7 @@ class Parser:
             body = self.parse_block()
             return ASTNode("CLASS_DEFINITION", class_name, body)
 
-        def parse_object(self):
+    def parse_object(self):
             if self.current_token != 'OBJECT':
                 raise SyntaxError("Expected 'OBJECT' keyword")
             self.current_token += 1
@@ -213,7 +217,7 @@ class Parser:
                     raise SyntaxError("Expected '}' or ','")
             return ASTNode("OBJECT_DEFINITION", object_name, properties)
 
-        def parse_class(self):
+    def parse_class(self):
             if self.current_token != 'CLASS':
                 raise SyntaxError("Expected 'CLASS' keyword")
             self.current_token += 1
@@ -227,7 +231,7 @@ class Parser:
             body; self.parse_block(self)
             return ASTNode("CLASS_DEFINITION", class_name, body, inheritance)
 
-        def parse_block(self):
+    def parse_block(self):
             self.consume('{')
             statements = []
             while True:
