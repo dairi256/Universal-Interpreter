@@ -226,6 +226,17 @@ class Parser:
                 inheritance = None
             body; self.parse_block(self)
             return ASTNode("CLASS_DEFINITION", class_name, body, inheritance)
+
+        def parse_block(self):
+            self.consume('{')
+            statements = []
+            while True:
+                statement = self.parse_stament()
+                if statement is None:
+                    break
+                statements.append(statement)
+            self.consume('}')
+            return statements
     # Put the parsing functions below this line. 
 
 class ASTNode:
