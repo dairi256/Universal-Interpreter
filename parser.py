@@ -1,3 +1,6 @@
+from enum import Enum
+
+class T
 class SyntaxError(Exception):
     pass
 
@@ -105,27 +108,6 @@ def parse_statement(self):
 
         return ASTNode("FOR_LOOP", variable, iterable, body)
 
-    def parse_expression(self):
-        token = self.tokens[self.current_token]
-        if token in ['NUMBER', 'STRING', 'IDENTIFIER']:
-            self.current_token += 1
-            return token
-        elif token == '(':
-            self.current_token += 1
-            expression = self.parse_expression()
-            if self.current_token != ')':
-                raise SyntaxError("Expected ')'")
-
-        elif token in ['+', '-', '*', '/', '**']:
-            operator = self.tokens[self.current_token]
-            self.current_token += 1
-            left = self.parse_expression()
-            right = self.parse_expression()
-            return BinaryOperation(left, operator, right)
-
-        else:
-            raise SyntaxError("Unexpected token " + token)
-
     def parse_variable(self):
         token = self.tokens[self.current_token]
         if token.isalpha():
@@ -215,17 +197,14 @@ def parse_statement(self):
             return ASTNode("FUNCTION_CALL", function_name, arguments)
 
     def parse_expression(self):
-            token = self.tokens[self.current_token]
-            if token in ["NUMBER', 'STRING', 'IDENTIFIER'"]:
-                expression = token
-                self.current_token += 1
-                return expression
-            elif token == '(':
-                expression = self.parse_function_call()
-                return expression
-            elif token == '[':
-                expression = self.parse_array_access()
-                return expression
+        token = self.tokens[self.current_token]
+        if token.type in [TokenType.NUMBER, TokenType.STRING, TokenType.IDENTIFIER]:
+            self.current_token += 1
+            return token
+        elif token.type == TokenType.LPAREN:
+            return self.parse_function_call()
+        elif token.type == TokenType.LBRACKET:
+            return self.parse_array_access()
 
     def parse_array(self):
             if self.current_token != '[':
@@ -332,9 +311,11 @@ def parse_statement(self):
                 right = self.parse_factor()
                 left = BinaryOperation(left, '**', right)
             elif token in ['+', '-']:
+                self.current_token += 1
+                left = UnaryOperation(token, left)
                 break
             else:
-                raise SyntaxError("Expected '**' or '+' or '-'")
+                break
         return left
                 
     # Put the parsing functions below this line. 
