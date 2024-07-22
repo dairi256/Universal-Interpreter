@@ -90,9 +90,16 @@ def parse_statement(self):
 
         self.current_token += 1
         variable = self.parse_variable()
+
+        if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'in':
+            raise SyntaxError("Expected 'in' keyword")
+
+        self.current_token += 1
+        iterable = self.parse_expression()
+
         if self.current_token != 'LOOP':
             raise SyntaxError("Expected 'loop'")
-        
+
         self.current_token += 1
         body = self.parse_statement()
 
