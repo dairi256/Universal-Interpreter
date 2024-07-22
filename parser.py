@@ -98,26 +98,26 @@ def parse_statement(self):
 
         return ASTNode("FOR_LOOP", variable, iterable, body)
 
-def parse_expression(self):
-    token = self.tokens[self.current_token]
-    if token in ['NUMBER', 'STRING', 'IDENTIFIER']:
-        self.current_token += 1
-        return token
-    elif token == '(':
-        self.current_token += 1
-        expression = self.parse_expression()
-        if self.current_token != ')':
-            raise SyntaxError("Expected ')'")
+    def parse_expression(self):
+        token = self.tokens[self.current_token]
+        if token in ['NUMBER', 'STRING', 'IDENTIFIER']:
+            self.current_token += 1
+            return token
+        elif token == '(':
+            self.current_token += 1
+            expression = self.parse_expression()
+            if self.current_token != ')':
+                raise SyntaxError("Expected ')'")
 
-    elif token in ['+', '-', '*', '/', '**']:
-        operator = self.tokens[self.current_token]
-        self.current_token += 1
-        left = self.parse_expression()
-        right = self.parse_expression()
-        return BinaryOperation(left, operator, right)
+        elif token in ['+', '-', '*', '/', '**']:
+            operator = self.tokens[self.current_token]
+            self.current_token += 1
+            left = self.parse_expression()
+            right = self.parse_expression()
+            return BinaryOperation(left, operator, right)
 
-    else:
-        raise SyntaxError("Unexpected token " + token)
+        else:
+            raise SyntaxError("Unexpected token " + token)
 
     def parse_variable(self):
         token = self.tokens[self.current_token]
@@ -137,9 +137,17 @@ def parse_expression(self):
         else:
             return variable
 
-def parse_statement(self):
-    if self.current_token >= len(self.tokens):
-        raise SyntaxError("Unexpected end of input")
+    def parse_program(self):
+        program = []
+        while self.current_toke != 'END':
+            statement = self.parse_statement()
+            program.append(statement)
+        return program
+
+
+    def parse_statement(self):
+        if self.current_token >= len(self.tokens):
+            raise SyntaxError("Unexpected end of input")
 
     token = self.tokens[self.current_token]
     self.current_token += 1
