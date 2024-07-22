@@ -289,6 +289,39 @@ def parse_statement(self):
                 statements.append(statement)
             self.consume('}')
             return statements
+
+    def parse_factor(self):
+        token = self.tokens[self.current_token]
+        if token['type'] == 'NUMBER':
+            self.curent_token += 1
+            return float(token['value'])
+        elif token['type'] == 'IDENTIFIER':
+            self.current_token += 1
+            return token['value']
+        elif token == '(':
+            self.current_token += 1
+            value = self.parse_expression()
+            if self.current_token != ')':
+                raise SyntaxError("Expected ')'")
+            self.current_token += 1
+            return value
+        else:
+            raise SyntaxError("Expected factor")
+
+    def parse_term(self):
+        left = self.parse_factor()
+        while True:
+            token = self.tokens[self.current_token]
+            if token in ['**']:
+                self.current_token += 1
+                right = self.parse_factor()
+                left = BinaryOperation(left, '**', right)
+            elif token in ['+', '-']:
+                break
+            else:
+                raise SyntaxError("Expected '**' or '+' or '-'")
+        return left
+                
     # Put the parsing functions below this line. 
 
 class ASTNode:
