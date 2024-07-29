@@ -22,9 +22,6 @@ class Token:
 class SyntaxError(Exception):
     pass
 
-class CustomError(Exception): #This is the base class for other exceptions.
-    pass
-
 class ASTnode:
     def __init__(self, value):
         self.value = value
