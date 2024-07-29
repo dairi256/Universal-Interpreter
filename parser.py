@@ -22,6 +22,9 @@ class Token:
 class SyntaxError(Exception):
     pass
 
+class CustomError(Exception): #This is the base class for other exceptions.
+    pass
+
 class ASTnode:
     def __init__(self, value):
         self.value = value
@@ -97,12 +100,15 @@ def parse_statement(self):
 
     def parse_if_statement(self):
         if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'if':
-            raise SyntaxError("expected 'if' keyword" )
+            raise SyntaxError("expected 'if' keyword but found '{self.tokens[self.current_token]}'")
 
         self.current_token += 1
         condition = self.parse_expression()
-        if self.current_token != 'THEN':
-            raise SyntaxError("Expected 'then'")
+
+    if self.current_token >= len(self.tokens) or self.tokens[self.current_token] != 'THEN':
+        raise SyntaxError("Expected 'then' after condition")
+
+
         self.current_token += 1
         body = self.parse_statement()
 
