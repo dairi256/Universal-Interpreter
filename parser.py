@@ -33,6 +33,10 @@ class BinaryOperation:
         self.right = right
     
     def evaluate(self):
+    # Type check
+        if not isinstance(self.left, (int, float)) or not isinstance(self.right, (int, float)):
+            raise TypeError(self.left, self.right)
+
         if self.operator == '+':
             return self.left + self.right
         elif self.operator == '-':
@@ -41,11 +45,12 @@ class BinaryOperation:
             return self.left * self.right
         elif self.operator == '/':
             if self.right == 0:
-                raise ZeroDivisionError("Cannot divide by zero")
+                raise ZeroDivisionError(f"Cannot divide {self.left} by zero.")
             return self.left / self.right
         elif self.operator == '**':
             return pow(self.left, self.right)
-
+        else:
+            raise UnsupportedOperatorError(self.operator)
     def __str__(self):
         return f"{self.left} {self.operator} {self.right}"
 

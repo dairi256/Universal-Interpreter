@@ -18,3 +18,18 @@ class VariableParseError(Exception):
     def __init__(self, message, token=None):
         super().__init__(message)
         self.token = token # This line is an optional token reference for debugging purposes.
+
+# The next few classes will be code for errors in 'def evaluate'
+class EvaluationError(Exception):
+    # This is the base class for errors that are evaluation-related.
+    pass
+
+class UnssupportedOperatorError(EvaluationError):
+    # This is raised when an unsupported operator is encountered.
+    def __init__(self, operator):
+        super().__init__(f"Unsupported operator: '{operator}'")
+
+class TypeError(EvaluationError):
+    # Raised when types are incompatible for evaluation.
+    def __init__(self, left, right):
+        super().__init__(f"Invalid types: left operand type '{type(left).__name__}', right operand type '{type(right).__name__}'")
