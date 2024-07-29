@@ -33,3 +33,16 @@ class TypeError(EvaluationError):
     # Raised when types are incompatible for evaluation.
     def __init__(self, left, right):
         super().__init__(f"Invalid types: left operand type '{type(left).__name__}', right operand type '{type(right).__name__}'")
+    
+# The next few lines are based on most if not all the parse functions, or will contribute to them.
+class ParseError(Exception):
+    # Base class for parsing errors.
+    pass
+
+class ExpectedKeywordError(ParseError):
+    def __init__(self, expected, found):
+        super().__init__(f"Expected'{expected}, but found {found}'.")
+
+class InvalidConditionError(ParseError):
+    def __init__(self):
+        super().__init__("Condition in 'if' statement cannot be empty or invalid.")

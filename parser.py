@@ -85,42 +85,62 @@ class Parser:
 
 def parse_statement(self):
     if self.current_token >= len(self.tokens):
-        raise SyntaxError("Unexpected end of input")
+        raise CustomSyntaxError("Unexpected end of input")
 
     token = self.tokens[self.current_token]
-    self.current_token += 1
-
-    if token == 'KEYWORD':
-        keyword = self.tokens[self.current_token - 1]
+    
+    if token.token_type == TokenType.KEYWORD:
+        keyword = token.value
         self.current_token += 1
+        
         if keyword == 'if':
             return self.parse_if_statement()
         elif keyword == 'for':
             return self.parse_for_loop()
         elif keyword == 'func':
             return self.parse_function_declaration()
-        # add more cases for other keywords here...
-    elif token.isalpha():
+        # Add more cases for other keywords as needed...
+        else:
+            raise CustomSyntaxError(f"Unexpected keyword '{keyword}'", keyword)
+    
+    elif token.token_type == TokenType.IDENTIFIER:  # Assuming TOKEN_TYPE.IDENTIFIER exists
+        self.current_token += 1
         return self.parse_variable_declaration()
+    
     else:
-        raise SyntaxError(f"Expected keyword or identifier (got {token})")
+        raise CustomSyntaxError(f"Expected keyword or identifier, got '{token.value}'", token)
 
 
-    def parse_if_statement(self):
-        if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'if':
-            raise SyntaxError("expected 'if' keyword but found '{self.tokens[self.current_token]}'")
+def parse_if_statement(self):
+    # Check for 'if' keyword
+    if (self.current_token >= len(self.tokens) or 
+            self.tokens[self.current_token][0] != 'KEYWORD' or 
+            self.tokens[self.current_token][1] != 'if'):
+        found_token = self.tokens[self.current_token] if self.current_token < len(self.tokens) else 'end of input'
+        raise ExpectedKeywordError('if', found_token)
 
-        self.current_token += 1
-        condition = self.parse_expression()
+    self.current_token += 1
+    
+    # Parse the condition
+    condition = self.parse_expression()
 
-    if self.current_token >= len(self.tokens) or self.tokens[self.current_token] != 'THEN':
-        raise SyntaxError("Expected 'then' after condition")
+    # Add a check for the condition validity
+    if not condition:  # Assuming condition should not be None or some other validation logic
+        raise InvalidConditionError()
 
+    # Check for 'then' keyword after condition
+    if (self.current_token >= len(self.tokens) or 
+            self.tokens[self.current_token][0] != 'KEYWORD' or 
+            self.tokens[self.current_token][1] != 'then'):
+        found_token = self.tokens[self.current_token] if self.current_token < len(self.tokens) else 'end of input'
+        raise ExpectedKeywordError('then', found_token)
 
-        self.current_token += 1
-        body = self.parse_statement()
+    self.current_token += 1
+    
+    # Parse the body of the if statement
+    body = self.parse_statement()
 
-        return IfStatement(condition, body)
+    return IfStatement(condition, body)
             
     def parse_for_loop(self):
         if self.current_token != 'KEYWORD' or self.tokens[self.current_token] != 'for':
