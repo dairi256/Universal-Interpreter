@@ -1,6 +1,24 @@
 from enum import Enum
 
-class T
+class TokenType(Enum):
+    NUMBER = 1
+    STRNG = 2
+    IDENTIFIER = 3
+    LPARREN = 4
+    RPARREN = 5
+    LBRACKET = 6
+    RBRACKET = 7
+
+class Token:
+    def __init__(self, token_type, value):
+        self.token_type = token_type
+        self.value = value
+    
+    def __repr__(self):
+        if self.detailed:
+            return f"Token of type {self.token_type} with value '{self.value}'"
+        return f"Token({self.token_type}, {self.value})"
+        
 class SyntaxError(Exception):
     pass
 
@@ -32,7 +50,10 @@ class BinaryOperation:
         return f"{self.left} {self.operator} {self.right}"
 
     def __repr__(self):
+        if self.detailed:
+            return f"BinaryOperation: {self.left} {self.operator} {self.right}"
         return f"BinaryOperation({self.left}, '{self.operator}', {self.right})"
+
 
 class IfStatement(ASTNode):
     def __init__(self, condition, body):
