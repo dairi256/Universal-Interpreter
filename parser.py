@@ -133,12 +133,16 @@ def parse_statement(self):
         return ASTNode("FOR_LOOP", variable, iterable, body)
 
     def parse_variable(self):
-        token = self.tokens[self.current_token]
-        if token.isalpha():
+        try:
+            token = self.tokens[self.current_token]
+        except IndexError:
+            raise VariableParseError("Error: No more tokens available to parse a variable.")
+
+        if token.isalpha():  # Modify if you need to include other characters like `_`
             self.current_token += 1
             return token
         else:
-            raise SyntaxError("Expected variable")
+            raise VariableParseError(f"Error: Expected variable, but got '{token}'", token)
 
     def parse_variable_declaration(self):
         if self.current_token != 'IDENTIFIER':
