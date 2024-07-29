@@ -22,6 +22,12 @@ class Token:
 class SyntaxError(Exception):
     pass
 
+class CustomSyntaxError(SyntaxError):
+    def __init__(self, message, token=None):
+        if token is not None:
+            message += f" (Token: '{token}')"
+            super().__init__(message)
+
 class ASTnode:
     def __init__(self, value):
         self.value = value
