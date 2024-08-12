@@ -79,9 +79,13 @@ class InvalidConditionError(ParseError):
 
 
 
-class ASTnode:
-    def __init__(self, value):
-        self.value = value
+class ASTNode:
+    def __init__(self, token, *args):
+        self.token = token
+        self.children = args  # Store multiple child nodes or values in a list
+
+    def __str__(self):
+        return f"{self.token}({', '.join(str(child) for child in self.children)})"
 
 class BinaryOperation:
     def __init__(self, left, operator, right):
@@ -429,16 +433,3 @@ def parse_if_statement(self):
         return left
                 
     # Put the parsing functions below this line. 
-
-class ASTNode:
-    def __init__(self, token, *args):
-        self.token = token
-        if len(args) > 0:
-            for arg in args:
-                setattr(self, "value", arg)
-
-    def __str__(self):
-        if hasattr(self, "value"):
-            return f"{self.token}({self.value})"
-        else:
-            return str(self.token)
