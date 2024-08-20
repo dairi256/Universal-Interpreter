@@ -139,11 +139,22 @@ class Parser:
         self.tokens = tokens
         self.current_token = 0
 
-    def parse(self):
+def parse(self):
+    try:
         ast = self.parse_statement()
         if self.current_token < len(self.tokens) - 1:
-            raise SyntaxError("Unexpected token")
+            raise CustomSyntaxError("Unexpected token", 
+                                    line=self.tokens[self.current_token].line,
+                                    column=self.tokens[self.current_token].column)
         return ast
+    
+    except CustomSyntaxError as e:
+        print(f"Syntax error: {e}")
+        return None
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return None
+
 
 def parse_statement(self):
     if self.current_token >= len(self.tokens):
