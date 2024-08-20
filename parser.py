@@ -246,12 +246,7 @@ def parse_if_statement(self):
             statement = self.parse_statement()
             program.append(statement)
         return program
-
-
-    def parse_statement(self):
-        if self.current_token >= len(self.tokens):
-            raise SyntaxError("Unexpected end of input")
-
+        
     token = self.tokens[self.current_token]
     self.current_token += 1
 
