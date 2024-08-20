@@ -23,10 +23,17 @@ class SyntaxError(Exception):
     pass
 
 class CustomSyntaxError(SyntaxError):
-    def __init__(self, message, token=None):
-        if token is not None:
-            message += f" (Token: '{token}')"
-            super().__init__(message)
+    def __init__(self, message, line=None, coluumn=None, token=None):
+        super().__init__(message)
+        self.line = line
+        self.column = coluumn
+        self.token = token
+
+    def __str__(self):
+        location = f"(Line: {self.line}, Column: {self.column})" if self.line is not None else ""
+        if self.token:
+            return f"{super().__str__()} Token: '{self.token}'{location}"
+        return f"{super().__str__()}{location}"
 
 class CustomError(Exception): # This is the base class for other exceptions.
     pass
@@ -246,7 +253,7 @@ def parse_if_statement(self):
             statement = self.parse_statement()
             program.append(statement)
         return program
-        
+
     token = self.tokens[self.current_token]
     self.current_token += 1
 
