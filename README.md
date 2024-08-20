@@ -10,7 +10,7 @@ This is a project to create a universal interpreter that can interpret most, if 
 
 ### Project Scope
 
-The scope of this project is ambitious, but I'm committed to doing my best to bring it to life.
+The scope of this project is ambitious, but I'm committed to doing my best to bring it to life. I feel that this project would bring a lot of convenience to myself and other's lives. I hope that people would feel this way when the final version releases and if it hopefully works.
 
 ### Code Availability
 
