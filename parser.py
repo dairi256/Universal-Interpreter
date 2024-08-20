@@ -94,11 +94,17 @@ class ASTNode:
     def __str__(self):
         return f"{self.token}({', '.join(str(child) for child in self.children)})"
 
-class BinaryOperation:
+class BinaryOperation(ASTNode):
     def __init__(self, left, operator, right):
         self.left = left
         self.operator = operator
         self.right = right
+
+class Program(ASTNode):
+    def __init__(self, statements):
+        super().__init__("PROGRAM", *statements)
+
+
     
     def evaluate(self):
     # Type check
