@@ -104,7 +104,25 @@ class Program(ASTNode):
     def __init__(self, statements):
         super().__init__("PROGRAM", *statements)
 
+class VariableDeclaration(ASTNode):
+    def __init__(self, variable, value):
+        super.__init__("VAR_DECL", variable, value)
 
+class FunctionDeclaration(ASTNode):
+    def __init__(self, name, params, body):
+        super().__init__("FUNC_DECL", name, params, body)
+
+class FunctionCall(ASTNode):
+    def __init__(self, function_name, arguments):
+        super().__init__("FUNC_CALL", function_name, *arguments)
+
+class ForLoop(ASTNode):
+    def __init__(self,variable, iterable, body):
+        super().__init__("FOR_LOOP", variable, iterable, body)
+
+class IfStatement(ASTNode):
+    def __init__(self, condition, body):
+        super().__init__("IF_STMT", condition, body)
     
     def evaluate(self):
     # Type check
